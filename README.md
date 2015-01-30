@@ -5,7 +5,7 @@ Taken from an old private repository of mine, last updated *Feb 26, 2014!*
 
 This is purely experimental, dealing with very granular reusable components.
 
-From the pre-Blaze era, some of these probably won't work.
+From the pre-Blaze era, some of these probably won't work--not that anybody should try.
 
 Example
 -------
