@@ -17,28 +17,28 @@ Example
 # Ensure that the component has the methodFacade subject
 ensureFacade = ->
   unless @methodFacade?
-    R.subjects.load @, 'methodFacade'
+    A.subjects.load @, 'methodFacade'
 
-R.subjects.save
+A.subjects.save
   name: 'CF__animations'
   options:
     loaded: ->
       ensureFacade.call @
       animations = {}
-      R.subjects.load @, 'RMS__animations'
+      A.subjects.load @, 'RMS__animations'
 
-R.subjects.save
+A.subjects.save
   name: 'CF__errors'
   options:
     loaded: ->
       ensureFacade.call @
-      R.subjects.load @, 'errors'
+      A.subjects.load @, 'errors'
       @methodFacade.map
         logifer: @errors.logifer
         flashifer: @errors.flashifer
 
 # Subject
-R.subjects.save
+A.subjects.save
   name: 'CF__collectionFactory'
   options:
     # Takes collection names as arguments
@@ -55,27 +55,27 @@ R.subjects.save
           # if console?.log?
           #   console.log config.collections
           throw new Error "Collection #{collection} isn't defined in config!"
-      R.subjects.load privateRef, ['sharedCollections', arr]
+      A.subjects.load privateRef, ['sharedCollections', arr]
       @methodFacade.map
         db: (collection) -> privateRef.sharedCollections(collection)
 
-R.subjects.save
+A.subjects.save
   name: 'CF__pubSubs'
   options:
     loaded: (options) ->
       ensureFacade.call @
       if options?
-        R.subjects.load @, ['pubSubs', [options]]
+        A.subjects.load @, ['pubSubs', [options]]
         @methodFacade.map
           getSub: @pubSubs.getSub
 
-R.subjects.save
+A.subjects.save
   name: 'CF__safeReactiveProperties'
   options:
     loaded: (options) ->
       ensureFacade.call @
       if options?
-        R.subjects.load @, ['safeReactiveProperties', [options]]
+        A.subjects.load @, ['safeReactiveProperties', [options]]
         @methodFacade.map
           set: @safeReactiveProperties.set
           get: @safeReactiveProperties.get
@@ -85,13 +85,13 @@ R.subjects.save
           setDefault: @safeReactiveProperties.setDefault
           setAllDefaults: @safeReactiveProperties.setAllDefaults
 
-R.subjects.save
+A.subjects.save
   name: 'CF__localTemplate'
   options:
     loaded: (options) ->
       ensureFacade.call @
       if options?
-        R.subjects.load @, 'localTemplate'
+        A.subjects.load @, 'localTemplate'
         for own key, val of options
           val.template = key
           @localTemplate.create val
