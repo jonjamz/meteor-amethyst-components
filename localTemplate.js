@@ -51,8 +51,6 @@ var bindExtendedContext = function (func, context) {
 
 var createLocalTemplate = function (obj) {
 
-  // console.log("CREATE LOCAL TEMPLATE", obj, obj ? obj.template : 'WTF?');
-
   // Setup even if it's just A.subjects.load without any args
   if (!this._templates && Meteor.isClient)
     this._templates = {};
@@ -111,13 +109,6 @@ var createLocalTemplate = function (obj) {
         this._areas[obj.renderAreas[aid]] = [];
         this._templates[obj.template].renderArea = function(area) {
           self._areaDep.depend();
-          // str = '<div>[' + area + ']<br/>'+ self._areas[area].length +' items</div>';
-          // // str += '<div>';
-          // _.each(self._areas[area], function(thing) {
-          //   console.log("RENDERING THING", thing);
-          //   str += thing;
-          // });
-          // str += '</div>'
           return new Handlebars.SafeString(Meteor.render(function() {
             var str = '';
             _.each(self._areas[area], function(fun) {
@@ -127,8 +118,6 @@ var createLocalTemplate = function (obj) {
           }));
         };
       }
-
-      // console.log("Create local template - RA", this._templates[obj.template], 'this?', this);
     }
 
     // Add the rest of the schtuff...
@@ -152,7 +141,6 @@ var getStatic = function (template, data) {
 };
 
 var getReactive = function (template) {
-  // console.log("***GR", this);
   return Meteor.render(this._templates[template]);
 };
 
@@ -162,31 +150,26 @@ var getAlias = function (template) {
 
 var loadInto = function(layout, where, template) {
   // console.log("LOAD", this, "INTO", layout);
-  layout._loadIntoArea(where, this._templates[template]);//getReactive(template));
-  // throw('li');
+  layout._loadIntoArea(where, this._templates[template]); //getReactive(template));
   // return $(where)[0].innerHtml = getReactive(template);
 };
 
 var appendInto = function(layout, where, template) {
-  layout._appendIntoArea(where, this._templates[template]);//getReactive(template));
-  // throw('ai');
+  layout._appendIntoArea(where, this._templates[template]); //getReactive(template));
   // return $(where).append(getReactive(template));
 };
 
 var prependInto = function(layout, where, template) {
-  layout._prependIntoArea(where, this._templates[template]);//getReactive(template));
-  // throw('pi');
+  layout._prependIntoArea(where, this._templates[template]); //getReactive(template));
   // return $(where).prepend(getReactive(template));
 };
 
 var _loadIntoArea = function(area, reactive) {
-  // console.log("_lia", this);
   this._areas[area] = [reactive];
   this._areaDep.changed();
 };
 
 var _prependIntoArea = function(area, reactive) {
-  // console.log("_pia", this);
   this._areas[area].push(reactive); // TODO: of course, this should go to the beginning of the table
   this._areaDep.changed();
 };
