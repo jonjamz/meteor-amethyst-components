@@ -3,14 +3,115 @@ Amethyst components (subjects) for Meteor
 
 Taken from an old private repository of mine, last updated *Feb 26, 2014!*
 
+This is purely experimental, dealing with very granular reusable components.
+
 From the pre-Blaze era, some of these probably won't work.
 
 Example
 -------
 
 ```coffeescript
+# Control how subjects are namespaced inside components using methodFacade
+# ------------------------------------------------------------------------
 
-observer = null # Watch content blocks for new ones
+# Ensure that the component has the methodFacade subject
+ensureFacade = ->
+  unless @methodFacade?
+    R.subjects.load @, 'methodFacade'
+
+R.subjects.save
+  name: 'CF__animations'
+  options:
+    loaded: ->
+      ensureFacade.call @
+      animations = {}
+      R.subjects.load @, 'RMS__animations'
+
+R.subjects.save
+  name: 'CF__errors'
+  options:
+    loaded: ->
+      ensureFacade.call @
+      R.subjects.load @, 'errors'
+      @methodFacade.map
+        logifer: @errors.logifer
+        flashifer: @errors.flashifer
+
+# Subject
+R.subjects.save
+  name: 'CF__collectionFactory'
+  options:
+    # Takes collection names as arguments
+    loaded: (options) ->
+      ensureFacade.call @
+      arr = []
+      privateRef = {} # Don't load db on `this`, use loaded() instance encapsulation
+
+      # Iterate through collections, getting the full object from config (lib/config/1.collections.coffee)
+      for collection in arguments
+        if config? and config.collections[collection]?
+          arr.push config.collections[collection]
+        else
+          # if console?.log?
+          #   console.log config.collections
+          throw new Error "Collection #{collection} isn't defined in config!"
+      R.subjects.load privateRef, ['sharedCollections', arr]
+      @methodFacade.map
+        db: (collection) -> privateRef.sharedCollections(collection)
+
+R.subjects.save
+  name: 'CF__pubSubs'
+  options:
+    loaded: (options) ->
+      ensureFacade.call @
+      if options?
+        R.subjects.load @, ['pubSubs', [options]]
+        @methodFacade.map
+          getSub: @pubSubs.getSub
+
+R.subjects.save
+  name: 'CF__safeReactiveProperties'
+  options:
+    loaded: (options) ->
+      ensureFacade.call @
+      if options?
+        R.subjects.load @, ['safeReactiveProperties', [options]]
+        @methodFacade.map
+          set: @safeReactiveProperties.set
+          get: @safeReactiveProperties.get
+          inc: @safeReactiveProperties.inc
+          dec: @safeReactiveProperties.dec
+          tog: @safeReactiveProperties.toggle
+          setDefault: @safeReactiveProperties.setDefault
+          setAllDefaults: @safeReactiveProperties.setAllDefaults
+
+R.subjects.save
+  name: 'CF__localTemplate'
+  options:
+    loaded: (options) ->
+      ensureFacade.call @
+      if options?
+        R.subjects.load @, 'localTemplate'
+        for own key, val of options
+          val.template = key
+          @localTemplate.create val
+        @methodFacade.map
+          getStaticTemplate: @localTemplate.getStatic
+          getReactiveTemplate: @localTemplate.getReactive
+          getTemplateAlias: @localTemplate.getAlias
+          loadInto: @localTemplate.loadInto
+          appendInto: @localTemplate.appendInto
+          prependInto: @localTemplate.prependInto
+          _loadIntoArea: @localTemplate._loadIntoArea
+          _appendIntoArea: @localTemplate._appendIntoArea
+          _prependIntoArea: @localTemplate._prependIntoArea
+```
+
+```coffeescript
+# Build a component
+# -----------------
+
+observer = null # Watch for new content blocks
 
 A.subjects.save
   name: 'repo__contentBlocks'
